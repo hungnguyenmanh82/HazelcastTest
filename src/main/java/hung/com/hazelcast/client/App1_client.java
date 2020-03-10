@@ -45,11 +45,14 @@ public class App1_client {
         // Get the Distributed Map from Cluster.
         IMap<String, String> map1 = hzClient.getMap("my-distributed-map");
         //Standard Put and Get.
-        map1.put("key", "value");
-        map1.get("key");
+        map1.put("key1", "value1");
+        map1.put("key2", "value2");
+        
+        System.out.println(map1.get("key1"));
+        
         //Concurrent Map methods, optimistic updating
         map1.putIfAbsent("somekey", "somevalue");
-        map1.replace("key", "value", "newvalue");
+        map1.replace("key2", "value", "newvalue");
         
         
         // Shutdown this Hazelcast client

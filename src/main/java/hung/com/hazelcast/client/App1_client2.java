@@ -10,10 +10,20 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
+
+/**
+ * step1: run 2 server Node. Thứ tự Start Server ko quan trọng => chúng tự động tạo cluster (=group).
+ * step2: run 2 client. Thứ tự ko quan trọng. Client tự động tìm server trong giải config.
+ */
+
+/**
+Cluster giống như Redis vậy là nơi lưu trữ distributed Data.
+Client có thể tạo Map, queue, pub/sub... và truy vấn dữ liệu bằng SQL
+ */
 public class App1_client2 {
 	
 	public static void main(String[] args){
-		ClientConfig config = new ClientConfig();
+		ClientConfig clientConfig = new ClientConfig();
 		
 		//========== config to connect to Server Node: xem file hazelcast.xml
 		// hazelcast.xml: dùng cho server Node config
@@ -23,31 +33,27 @@ public class App1_client2 {
         		<password>my-password</password>
     		</group>
 		 */
-		GroupConfig groupConfig = config.getGroupConfig();
-		groupConfig.setName("MyCluster");
-		groupConfig.setPassword("my-password");
+		GroupConfig groupConfig = clientConfig.getGroupConfig();
+		groupConfig.setName("MyCluster");           // phải có GroupName thì client mới truy suat đc Cluster Nodes.
+//		groupConfig.setPassword("my-password123");  //password chỉ dùng cho bản thương mại
+				
+		clientConfig.getNetworkConfig().addAddress("127.0.0.1");
 		
 		/**
 		 * client sẽ tạo socket non-blocking tới tất cả các Server Node
 		 */
-		HazelcastInstance hzClient 	  = HazelcastClient.newHazelcastClient(config);
+		HazelcastInstance hzClient 	  = HazelcastClient.newHazelcastClient(clientConfig);
 		
-		// lấy thông tin từ Map tên là "data" đã tạo ở server Node
-		Map<Long, String> map = hzClient.getMap("data");
-		
-	    for(Entry<Long, String> entry: map.entrySet() ) {
-	        System.out.println("{" + entry.getKey() + "," + entry.getValue() + "}" );
-	    }
 	    
 	    //================================== create Map from client 
         // Get the Distributed Map from Cluster.
         IMap<String, String> map1 = hzClient.getMap("my-distributed-map");
         //Standard Put and Get.
-        map1.put("key", "value");
-        map1.get("key");
-        //Concurrent Map methods, optimistic updating
-        map1.putIfAbsent("somekey", "somevalue");
-        map1.replace("key", "value", "newvalue");
+		
+	    for(Entry<String, String> entryClient: map1.entrySet() ) {
+	        System.out.println("{" + entryClient.getKey() + "," + entryClient.getValue() + "}" );
+	    }
+	   
         
         
         // Shutdown this Hazelcast client
