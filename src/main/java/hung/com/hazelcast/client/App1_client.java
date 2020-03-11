@@ -10,6 +10,15 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 
+/**
+ * step1: run 2 server Node. Thứ tự Start Server ko quan trọng => chúng tự động tạo cluster (=group).
+ * step2: run 2 client. Thứ tự ko quan trọng. Client tự động tìm server trong giải config.
+ */
+
+/**
+Cluster giống như Redis vậy là nơi lưu trữ distributed Data.
+Client có thể tạo Map, queue, pub/sub... và truy vấn dữ liệu bằng SQL
+ */
 public class App1_client {
 	
 	public static void main(String[] args){
