@@ -18,7 +18,10 @@ public class App1_serverNode2 {
 	
 	public static void main(String[] args){
 		
-		
+		System.out.println("step1: run App1_serverNode1 to create Node1 of Hazelcast cluster");
+		System.out.println("step2: run App1_serverNode2 to create Node1 of Hazelcast cluster");
+		System.out.println("step3: run App1_client to CRUD to Hazelcast cluster");
+		System.out.println("step4: run App1_client2 to CRUD to Hazelcast cluster");
 		HazelcastInstance hzInstance = Hazelcast.newHazelcastInstance();
 		
 		// crate map at Server Node
