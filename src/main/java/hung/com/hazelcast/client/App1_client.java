@@ -16,7 +16,7 @@ import com.hazelcast.core.IMap;
  */
 
 /**
-Cluster giống như Redis vậy là nơi lưu trữ distributed Data.
+Cluster giống như Redis. Khác biệt đó là lưu trữ distributed storage. Redis dùng replicate Storage
 Client có thể tạo Map, queue, pub/sub... và truy vấn dữ liệu bằng SQL
  */
 public class App1_client {
