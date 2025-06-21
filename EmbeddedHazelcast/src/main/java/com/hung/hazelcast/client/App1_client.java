@@ -1,14 +1,15 @@
-package hung.com.hazelcast.client;
+package com.hung.hazelcast.client;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.config.GroupConfig;
-import com.hazelcast.core.Hazelcast;
+import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
+import com.hazelcast.map.IMap;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * step1: run 2 server Node. Thứ tự Start Server ko quan trọng => chúng tự động tạo cluster (=group).
@@ -19,45 +20,35 @@ import com.hazelcast.core.IMap;
 Cluster giống như Redis. Khác biệt đó là lưu trữ distributed storage. Redis dùng replicate Storage
 Client có thể tạo Map, queue, pub/sub... và truy vấn dữ liệu bằng SQL
  */
+@Slf4j
 public class App1_client {
 	
-	public static void main(String[] args){
-		ClientConfig clientConfig = new ClientConfig();
-		
-		//========== config to connect to Server Node: xem file hazelcast.xml
-		// hazelcast.xml: dùng cho server Node config
-		/**
-		     <group>
-        		<name>MyCluster</name>
-        		<password>my-password</password>
-    		</group>
-		 */
-		GroupConfig groupConfig = clientConfig.getGroupConfig();
-		groupConfig.setName("MyCluster");           // phải có GroupName thì client mới truy suat đc Cluster Nodes.
-//		groupConfig.setPassword("my-password123");  //password chỉ dùng cho bản thương mại
-				
-		clientConfig.getNetworkConfig().addAddress("127.0.0.1");
-		
+	public static void main(String[] args) throws IOException {
+		log.debug("=============================== start {}", App1_client.class.getSimpleName());
+		// Xây dựng cấu hình client bằng cách đọc từ file XML.
+		ClientConfig clientConfig = new XmlClientConfigBuilder("hazelcast-client.xml").build();
+
 		/**
 		 * client sẽ tạo socket non-blocking tới tất cả các Server Node
 		 */
 		HazelcastInstance hzClient 	  = HazelcastClient.newHazelcastClient(clientConfig);
 		
 		// lấy thông tin từ Map tên là "data" đã tạo ở server Node
-		Map<Long, String> map = hzClient.getMap("data");
+		Map<Long, String> map = hzClient.getMap("myMap");
 		
 	    for(Entry<Long, String> entry: map.entrySet() ) {
-	        System.out.println("{" + entry.getKey() + "," + entry.getValue() + "}" );
+	        log.debug("{" + entry.getKey() + "," + entry.getValue() + "}" );
 	    }
 	    
 	    //================================== create Map from client 
-        // Get the Distributed Map from Cluster.
-        IMap<String, String> map1 = hzClient.getMap("my-distributed-map");
+        // Map này đc khởi tạo trong hazelcast_server.xml ở ServerNode
+        IMap<String, String> map1 = hzClient.getMap("Data");
         //Standard Put and Get.
         map1.put("key1", "value1");
         map1.put("key2", "value2");
-        
-        System.out.println(map1.get("key1"));
+
+		String key = "key1";
+		log.debug("key = {}, value = {}", key, map1.get(key));
         
         //Concurrent Map methods, optimistic updating
         map1.putIfAbsent("somekey", "somevalue");

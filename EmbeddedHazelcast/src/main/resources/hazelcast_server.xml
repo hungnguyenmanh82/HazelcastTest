@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Intellij dựa vào các file này để hỗ trợ hiển thị XML tag config cho hazelcast
+ nếu config trong code luôn thì ko cần file config này cũng được -->
+<hazelcast xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.hazelcast.com/schema/config
+                               http://www.hazelcast.com/schema/config/hazelcast-config-5.5.xsd">
+
+    <cluster-name>my-hazelcast-cluster</cluster-name>
+
+    <network>
+        <!-- ServerNode sẽ scan từ port 57011 tới 5701+20 để tìm port available -->
+        <!-- cả client và ServerNode đều truy cập port này -->
+        <port auto-increment="true" port-count="20">5701</port>
+        <join>
+            <multicast enabled="false"/>
+            <tcp-ip enabled="true">
+                <member-list>
+                    <member>127.0.0.1</member>
+                </member-list>
+            </tcp-ip>
+        </join>
+        <!-- listen trên interface này (computer có thể có nhiều Network Interface) -->
+        <interfaces enabled="true">
+            <interface>127.0.0.1</interface>
+        </interfaces>
+    </network>
+
+    <map name="myMap">
+        <!-- số bản backup-partion -->
+        <backup-count>1</backup-count>
+    </map>
+
+</hazelcast>

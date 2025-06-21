@@ -4,37 +4,114 @@
 	<groupId>hung.com</groupId>
 	<artifactId>hazelcastTest</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <modules>
+        <module>EmbeddedHazelcast</module>
+		<module>EmbeddedHazelcast2</module>
+    </modules>
 
-	<properties>
+    <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<log4j2.version>2.14.1</log4j2.version>
 	</properties>
 
+	<!-- các dependencies version ở đây sẽ đc ưu tiên dùng -->
+	<!-- dùng để thay thế cho  spring-boot-starter-parent ở trên -->
+	<dependencyManagement>
+		<dependencies>
+			<!--  dùng cái này quản lý dependency thay thì dùng spring-boot-starter-parent-->
+			<dependency>
+				<!-- Import dependency management from Spring Boot -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>3.0.2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency><!---->
+
+			<!-- cần add cái này nếu ko Spring cloud sẽ bị báo lỗi ko tìm thấy thư viện khi build -->
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>2022.0.1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.projectlombok</groupId>
+				<artifactId>lombok</artifactId>
+				<version>1.18.36</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
-		<!-- for hazelcast servers or Node -->
+		<!-- chỉ chứa api, chưa implement  -->
+		<!-- netty, vertx đều dùng slf4j dùng java SPI (Service Provider Interface) -->
+		<!-- config file theo log core implement -->
 		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast</artifactId>
-			<version>3.12.6</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.32</version>
 		</dependency>
 
-		<!-- for hazelcast client -->
+		<!-- https://logging.apache.org/log4j/2.x/maven-artifacts.html -->
+		<!-- guide dùng implement log4j2 mà ko phải đổi source code log cũ slf4j API đi: slf4j, log4j2x, appache commons logging bridge -->
+		<!-- bản chất là dùng Java SPI: Service Provider Interface. -->
+		<!-- log4j2 lúc này sẽ implement SPI của slf4j, log4j2x,... -->
+		<!-- đây là bridge để implement SLf4j SPI -->
+		<!-- xóa bỏ thu viện này để dùng lại logback-core implement -->
 		<dependency>
-			<groupId>com.hazelcast</groupId>
-			<artifactId>hazelcast-client</artifactId>
-			<version>3.12.6</version>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>${log4j2.version}</version>
 		</dependency>
 
+		<!-- Version của api và core phải giống nhau, nếu ko sẽ báo lỗi -->
+		<!-- nhiều log API cùng tồn tại với duy nhất 1 log-core implement ko sao cả -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j2.version}</version>
+		</dependency>
+
+		<!-- Setter, Getter, Constructor, @toString, @log4j -->
+		<!-- lombok chỉ dùng ở pre-compile vì thế để scope = provided -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.20</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<!-- -->
 		<plugins>
+			<!-- plugin này sẽ gọi tới javac ở $JAVA_HOME enviroment trỏ tới JDK folder -->
+			<!-- các config của javac sẽ tương ứng với mục configuration ở maven-compiler-plugin -->
+			<!-- java là dynamic compile optimize runtime nên ko cần compiler optimize options -->
+			<!-- compile ở đây là ra bytecode, ko phải là binary code giống static compile -->
+			<!-- thông tin debug dùng để map sourceCode. ko tác động tới việc dynamic compile binary ở runtime-->
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.7.0</version>
+				<version>3.8.1</version>
 				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
+					<!-- cho Plugin biết syntax source *.java là version 11 (JDK >= 11) -->
+					<source>17</source>
+					<!-- compile compatible để run trên JVM 11  (JDK >= 11) -->
+					<target>17</target>
+					<!-- cho Plugin biết *.java đc mã hóa UTF8 -->
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 

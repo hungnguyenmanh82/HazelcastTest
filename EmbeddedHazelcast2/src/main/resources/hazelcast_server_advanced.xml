@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config
+        http://www.hazelcast.com/schema/config/hazelcast-config-5.3.xsd"
+           xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <network>
+        <!-- port này chỉ cho mục đích các ServerNode kết nối với nhau
+        client ko kết nối với serverNode qua port này -->
+        <member-endpoints>
+            <member-endpoint name="default">
+                <public-address>192.168.1.100</public-address>
+
+                <port auto-increment="true" port-count="100">5701</port>
+
+            </member-endpoint>
+        </member-endpoints>
+
+        <!-- port này là để Client kết nối tới ServerNode -->
+        <client-endpoints>
+            <client-endpoint name="default-client-endpoint">
+                <public-address>192.168.1.100</public-address>
+
+                <port auto-increment="false">9000</port> <ssl enabled="true">
+                <factory-class-name>com.hazelcast.nio.ssl.BasicSSLContextFactory</factory-class-name>
+                <properties>
+                    <property name="keyStore">/path/to/server_keystore.jks</property>
+                    <property name="keyStorePassword">server_password</property>
+                    <property name="trustStore">/path/to/server_truststore.jks</property>
+                    <property name="trustStorePassword">server_password</property>
+                </properties>
+            </ssl>
+            </client-endpoint>
+        </client-endpoints>
+
+        <!-- đây là danh sách các ServerNode member trong cluster-->
+        <join>
+            <multicast enabled="false"/>
+            <tcp-ip enabled="true">
+                <member>192.168.1.100:5701</member>
+                <member>192.168.1.101:5701</member>
+                <member>192.168.1.102:5701</member>
+            </tcp-ip>
+        </join>
+
+    </network>
+
+    <map name="my-map">
+        <backup-count>1</backup-count>
+        <max-size>200MB</max-size>
+        <eviction-policy>LRU</eviction-policy>
+    </map>
+
+</hazelcast>
