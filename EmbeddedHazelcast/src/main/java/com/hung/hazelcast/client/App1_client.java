@@ -35,6 +35,7 @@ public class App1_client {
 		
 		// lấy thông tin từ Map tên là "data" đã tạo ở server Node
 		Map<Long, String> map = hzClient.getMap("myMap");
+
 		
 	    for(Entry<Long, String> entry: map.entrySet() ) {
 	        log.debug("{" + entry.getKey() + "," + entry.getValue() + "}" );
@@ -42,17 +43,17 @@ public class App1_client {
 	    
 	    //================================== create Map from client 
         // Map này đc khởi tạo trong hazelcast_server.xml ở ServerNode
-        IMap<String, String> map1 = hzClient.getMap("Data");
+        IMap<String, String> myMap = hzClient.getMap("myMap");
         //Standard Put and Get.
-        map1.put("key1", "value1");
-        map1.put("key2", "value2");
+        myMap.put("key1", "value1");
+        myMap.put("key2", "value2");
 
 		String key = "key1";
-		log.debug("key = {}, value = {}", key, map1.get(key));
+		log.debug("key = {}, value = {}", key, myMap.get(key));
         
         //Concurrent Map methods, optimistic updating
-        map1.putIfAbsent("somekey", "somevalue");
-        map1.replace("key2", "value", "newvalue");
+        myMap.putIfAbsent("somekey", "somevalue");
+        myMap.replace("key2", "value", "newvalue");
         
         
         // Shutdown this Hazelcast client
