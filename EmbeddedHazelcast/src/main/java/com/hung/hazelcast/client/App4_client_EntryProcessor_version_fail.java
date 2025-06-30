@@ -19,10 +19,10 @@ import java.io.IOException;
  + run and restart app để xem version thay đổi thế nào
  */
 @Slf4j
-public class App4_client_EntryProcessor_version {
+public class App4_client_EntryProcessor_version_fail {
 
 	public static void main(String[] args) throws IOException {
-		log.debug("=============================== start {}", App4_client_EntryProcessor_version.class.getSimpleName());
+		log.debug("=============================== start {}", App4_client_EntryProcessor_version_fail.class.getSimpleName());
 		// Xây dựng cấu hình client bằng cách đọc từ file XML.
 		ClientConfig clientConfig = new XmlClientConfigBuilder("hazelcast-client.xml").build();
 
